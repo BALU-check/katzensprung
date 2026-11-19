@@ -109,3 +109,14 @@ body.touch .kbd-hint { display: none; }
   .pad button.jump { width: 82px; height: 82px; }
 }
 @media (prefers-reduced-motion: reduce) { .rotate .phone { animation: none; transform: rotate(-90deg); } }
+
+.hud-warm { display: inline-flex; align-items: center; gap: 5px; font-variant-numeric: tabular-nums; }
+.hud-warm svg { width: 14px; height: 18px; }
+.hud-warm .bar { width: 64px; height: 10px; border-radius: 999px; background: rgba(43, 29, 20, .15); overflow: hidden; }
+.hud-warm .bar i { display: block; height: 100%; width: 100%; border-radius: inherit; background: linear-gradient(90deg, #ffb347, #ff6a2a); }
+.hud-warm b { min-width: 1.3em; text-align: right; }
+.hud-warm.cold .bar i { background: linear-gradient(90deg, #8ec5ff, #4a90e2); }
+.hud-warm.cold { color: #2c6fc2; animation: shiver .35s ease-in-out infinite; }
+@keyframes shiver { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(1.5px); } }
+@media (max-width: 700px) { .hud-name { display: none; } }
+@media (prefers-reduced-motion: reduce) { .hud-warm.cold { animation: none; } }

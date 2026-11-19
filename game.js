@@ -3,7 +3,7 @@
   'use strict';
 
   const TS = 32, G = 1900, MAXFALL = 820, RUN = 190, JUMP = 575, CLIMB = 135, HOP = 440;
-  const STEP = 1 / 120;
+  const STEP = 1 / 120, WARM_MAX = 15;
 
   const FUR = '#f39a3d', FUR_D = '#d4712a', FUR_L = '#ffe3bf', PINK = '#ff9aa8', INK = '#2b1d14';
 
@@ -15,6 +15,7 @@
     ['#f7c58a', '#fff0d9', '#e3b98f', '#b9a06a', '#ffe08a'],
     ['#8ea6f0', '#f0dcf7', '#b9b3e6', '#8f8fcf', '#fff4d6'],
     ['#ff8f70', '#ffd9a3', '#e59a7d', '#b8705e', '#fff0b3'],
+    ['#7f9cc4', '#e3ecf5', '#bccbdf', '#eef3f8', '#ffe7c2'],
   ];
 
   /* ---------------- Level ---------------- */
@@ -143,27 +144,31 @@
       },
     },
     {
-      name: 'Der große Baum', sky: 5, W: 70, H: 18,
-      intro: 'Das letzte Stück! Ganz oben im großen Baum steht Minkas Schale Milch.',
+      name: 'Der große Baum', sky: 6, W: 70, H: 18, snow: true,
+      intro: 'Es hat geschneit! Minka friert schnell: Spätestens alle 15 Sekunden muss sie sich an einem Feuer aufwärmen. Ganz oben im großen Baum steht ihre Milch.',
       build(b) {
         b.ground(0, 69, 16);
         b.start(2, 15);
-        b.sign(4, 15, 'Hinter dem Zaun läuft ein Hund herum. Kletter schnell die Mauer hoch!');
+        b.sign(3, 15, 'Brrr, Schnee! Stell dich ans Feuer, um dich aufzuwärmen. Oben siehst du, wie warm Minka noch ist.');
+        b.fire(5, 15);
         b.wall(7, 12, 1, 4);
         b.wall(9, 15, 1, 1);
         b.dog(13, 15);
         b.wall(17, 10, 2, 6);
-        b.fish(17, 9);
+        b.fire(17, 9);
+        b.fish(18, 8);
         b.water(19, 22, 16);
         b.thorns(25, 41, 15);
         b.tree(24, 16, 9);
         b.fish(24, 6);
         b.tree(31, 16, 11);
-        b.checkpoint(31, 4);
+        b.fire(31, 4);
         b.plank(36, 6, 3);
         b.fish(37, 5);
         b.wall(42, 2, 2, 14);
-        b.fish(43, 1);
+        b.fire(42, 1);
+        b.fish(43, 0);
+        b.fire(44, 15);
         b.wall(46, 15, 1, 1);
         b.dog(51, 15);
         b.tree(56, 16, 13);
@@ -178,7 +183,7 @@
     const W = def.W, H = def.H;
     const grid = [];
     for (let y = 0; y < H; y++) grid.push(new Array(W).fill('.'));
-    const lv = { def, W, H, grid, fish: [], dogs: [], signs: [], checkpoints: [], start: null, milk: null };
+    const lv = { def, W, H, grid, fish: [], dogs: [], signs: [], checkpoints: [], fires: [], start: null, milk: null };
     const set = (x, y, c) => { if (x >= 0 && x < W && y >= 0 && y < H) grid[y][x] = c; };
     const fill = (x, y, w, h, c) => { for (let j = y; j < y + h; j++) for (let i = x; i < x + w; i++) set(i, j, c); };
     def.build({
@@ -195,6 +200,7 @@
       dog: (x, y) => lv.dogs.push({ x: x * TS, y: (y + 1) * TS - 22, w: 30, h: 22, dir: -1, t: Math.random() * 5, x0: x * TS }),
       sign: (x, y, text) => lv.signs.push({ x: x * TS + 16, y: (y + 1) * TS, text }),
       checkpoint: (x, y) => lv.checkpoints.push({ x: x * TS + 16, y: (y + 1) * TS, on: false }),
+      fire: (x, y) => lv.fires.push({ x: x * TS + 16, y: (y + 1) * TS, on: false }),
     });
     return lv;
   }
@@ -366,6 +372,7 @@
       restart: '<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M4 3v5h5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
       sound: '<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
       full: '<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+      flame: '<svg viewBox="0 0 16 20"><path d="M8 1c1 4 6 6 6 11a6 6 0 0 1-12 0c0-3 2-4 3-6 1 2 2 2 2 3 1-2 1-5 1-8z" fill="#ff7a2e"/><path d="M8 10c1 2 3 3 3 5a3 3 0 0 1-6 0c0-2 2-3 3-5z" fill="#ffd166"/></svg>',
       fish: '<svg viewBox="0 0 28 16"><path d="M2 8c4-6 13-7 18 0-5 7-14 6-18 0z" fill="#5aa9e6"/><path d="M19 8l7-5v10z" fill="#5aa9e6"/><circle cx="7" cy="6.8" r="1.4" fill="#1d3557"/></svg>',
     };
     const isLast = levelNo === LEVELS.length;
@@ -377,6 +384,7 @@
           <span class="hud-level">Level ${levelNo}</span>
           <span class="hud-name">${def.name}</span>
           <span class="hud-fish">${ICON.fish}<b id="fishCount">0/${fishTotal}</b></span>
+          ${def.snow ? `<span class="hud-warm" id="warm" aria-label="Wärme">${ICON.flame}<span class="bar"><i id="warmBar"></i></span><b id="warmNum">15</b></span>` : ''}
         </div>
         <div class="hud-right">
           <button class="icon-btn" id="btnRestart" aria-label="Level neu starten">${ICON.restart}</button>
@@ -400,7 +408,7 @@
           <p class="eyebrow">Level ${levelNo} von ${LEVELS.length}</p>
           <h1>${def.name}</h1>
           <p>${def.intro}</p>
-          <p class="small">Sammle unterwegs ${fishTotal} Fische. Fahnen speichern deinen Weg.<span class="kbd-hint"> Am Computer: Pfeiltasten und Leertaste.</span></p>
+          <p class="small">Sammle unterwegs ${fishTotal} Fische. ${def.snow ? 'Feuer' : 'Fahnen'} speichern deinen Weg.<span class="kbd-hint"> Am Computer: Pfeiltasten und Leertaste.</span></p>
           <button class="big-btn" id="btnStart">Los geht's</button>
         </div>
       </div>
@@ -541,7 +549,8 @@
     }
 
     /* --- Spielzustand --- */
-    let state = 'intro', t = 0, deadT = 0, deathKind = '', winT = 0, fishGot = 0;
+    let state = 'intro', t = 0, deadT = 0, deathKind = '', winT = 0, fishGot = 0, warmth = WARM_MAX;
+    const warmBar = $('warmBar'), warmNum = $('warmNum'), warmEl = $('warm');
     const p = { x: 0, y: 0, w: 24, h: 20, vx: 0, vy: 0, onGround: false, climbing: false, face: 1, lock: 0, coyote: 0, hopping: false, ph: 0, inv: 0, blinkT: 2 };
     let respawn = lv.start;
     const particles = [];
@@ -555,7 +564,7 @@
     function restartLevel() {
       lv = buildLevel(def);
       respawn = lv.start; fishGot = 0; fishCountEl.textContent = `0/${fishTotal}`;
-      particles.length = 0; placeAt(respawn); p.inv = 0;
+      particles.length = 0; placeAt(respawn); p.inv = 0; warmth = WARM_MAX;
       state = 'play'; winOv.hidden = true; startOv.hidden = true;
       snapCamera();
     }
@@ -614,6 +623,7 @@
       if (kind === 'water') { burst(cx, cy, 16, 'drop', '#6bb8f0'); sfx('splash'); toast('Platsch! Minka hasst nasse Pfoten.'); }
       else if (kind === 'thorns') { burst(cx, cy - 8, 8, 'star', '#ffd166'); sfx('ouch'); toast('Autsch, Dornen!'); p.vy = -380; }
       else if (kind === 'dog') { burst(cx, cy - 10, 8, 'star', '#ffd166'); sfx('ouch'); toast('Wuff! Der Hund hat Minka erschreckt.'); p.vy = -420; }
+      else if (kind === 'cold') { burst(cx, cy - 10, 14, 'star', '#cfe8ff'); sfx('ouch'); toast('Brrr, zu kalt! Wärm dich öfter am Feuer auf.'); }
       else { sfx('ouch'); toast('Huch, zu tief gefallen!'); }
     }
 
@@ -637,6 +647,7 @@
         q.life += dt;
         if (q.life > q.max) { particles.splice(i, 1); continue; }
         if (q.kind === 'heart') { q.y -= 30 * dt; q.x += Math.sin(q.life * 6 + q.vx) * 12 * dt; }
+        else if (q.kind === 'ember') { q.x += q.vx * dt; q.y += q.vy * dt; }
         else { q.vy += (q.kind === 'dust' ? 0 : 900) * dt; q.x += q.vx * dt; q.y += q.vy * dt; q.vx *= 0.96; }
       }
       p.blinkT -= dt; if (p.blinkT < -0.12) p.blinkT = 2 + Math.random() * 3;
@@ -645,7 +656,7 @@
         deadT += dt;
         if (deathKind !== 'water' && deathKind !== 'fall') { p.vy = Math.min(p.vy + G * dt, MAXFALL); p.y += p.vy * dt; }
         if (deadT > 1.0) {
-          placeAt(respawn); state = 'play'; p.inv = 1.4;
+          placeAt(respawn); state = 'play'; p.inv = 1.4; warmth = WARM_MAX;
           burst(p.x + p.w / 2, p.y + p.h, 8, 'dust', 'rgba(255,255,255,.9)');
         }
         return;
@@ -739,6 +750,20 @@
           burst(cp.x + 8, cp.y - 26, 10, 'star', '#ff9f6e');
         }
       }
+      // Feuer: aufwärmen und Speicherpunkt
+      if (def.snow) {
+        let fireNear = null;
+        for (const f of lv.fires) if (Math.abs(p.x + p.w / 2 - f.x) < 44 && Math.abs(p.y + p.h - f.y) < 24) fireNear = f;
+        if (fireNear) {
+          warmth = Math.min(WARM_MAX, warmth + 14 * dt);
+          if (!fireNear.on) {
+            fireNear.on = true; respawn = { x: fireNear.x, y: fireNear.y }; sfx('flag'); toast('Schön warm! Hier geht es weiter.');
+          }
+        } else {
+          warmth -= dt;
+          if (warmth <= 0) { warmth = 0; return die('cold'); }
+        }
+      }
       // Schilder
       let near = null;
       for (const s of lv.signs) if (Math.abs(p.x + p.w / 2 - s.x) < 52 && Math.abs(p.y + p.h - s.y) < 70) near = s;
@@ -815,7 +840,11 @@
         ctx.fillStyle = '#86593a';
         ctx.fillRect(x + (h % 20) + 4, y + ((h >> 5) % 16) + 10, 5, 4);
         ctx.fillRect(x + ((h >> 9) % 22) + 2, y + ((h >> 13) % 18) + 6, 3, 3);
-        if (above !== '#' && above !== 'w') {
+        if (above !== '#' && above !== 'w' && def.snow) {
+          ctx.fillStyle = '#d3dfec'; ctx.fillRect(x, y, TS + 0.6, 12);
+          ctx.fillStyle = '#f5f9fd'; ctx.fillRect(x, y, TS + 0.6, 9);
+          circle(ctx, x + 8 + (h & 7), y + 1, 4); circle(ctx, x + 22 + ((h >> 3) & 5), y + 1, 3.5);
+        } else if (above !== '#' && above !== 'w') {
           ctx.fillStyle = '#4aa63f'; ctx.fillRect(x, y, TS, 11);
           ctx.fillStyle = '#5bbd4f'; ctx.fillRect(x, y, TS, 8);
           ctx.fillStyle = '#74d363';
@@ -831,7 +860,8 @@
             ctx.fillRect(x + x0 + (bx >= 0 ? 1 : 0), y + k * 8 + 1, x1 - x0 - (bx >= 0 ? 1 : 0), 7);
           }
         }
-        if (tile(c, r - 1) !== 'B') { ctx.fillStyle = '#d9d0c4'; ctx.fillRect(x - 1, y, TS + 2, 5); ctx.fillStyle = '#b9ad9d'; ctx.fillRect(x - 1, y + 5, TS + 2, 1.5); }
+        if (tile(c, r - 1) !== 'B') { ctx.fillStyle = '#d9d0c4'; ctx.fillRect(x - 1, y, TS + 2, 5); ctx.fillStyle = '#b9ad9d'; ctx.fillRect(x - 1, y + 5, TS + 2, 1.5);
+          if (def.snow) { ctx.fillStyle = '#f5f9fd'; ctx.fillRect(x - 1, y - 4, TS + 2, 6); circle(ctx, x + 10, y - 3, 4); circle(ctx, x + 24, y - 2.5, 3.5); } }
       } else if (ch === 'T') {
         ctx.fillStyle = '#7b4d2c'; ctx.fillRect(x + 2, y, TS - 4, TS + 0.6);
         ctx.fillStyle = '#5f3a20';
@@ -850,13 +880,15 @@
         circle(ctx, x + 10 + (h & 3), y + 5, 5); circle(ctx, x + 24 - (h & 3), y + 4, 4.5);
         if (tile(c - 1, r) !== 'L') { ctx.fillStyle = '#357f3b'; circle(ctx, x - 2, y + 17, 9); }
         if (tile(c + 1, r) !== 'L') { ctx.fillStyle = '#357f3b'; circle(ctx, x + TS + 2, y + 17, 9); }
+        if (def.snow) { ctx.fillStyle = '#f5f9fd'; ellipse(ctx, x + 10, y + 2, 8, 4); ellipse(ctx, x + 24, y + 1.5, 7, 3.5); ellipse(ctx, x + 17, y + 3, 6, 3); }
       } else if (ch === '-') {
         ctx.fillStyle = '#7d5330'; ctx.fillRect(x, y + 8, TS, 4);
         ctx.fillStyle = '#b07a43'; ctx.fillRect(x, y, TS, 8);
         ctx.fillStyle = '#c99158'; ctx.fillRect(x, y, TS, 2.5);
         ctx.fillStyle = '#5f3a20'; circle(ctx, x + 4, y + 4.5, 1.2); circle(ctx, x + TS - 4, y + 4.5, 1.2);
+        if (def.snow) { ctx.fillStyle = '#f5f9fd'; ctx.fillRect(x, y - 3, TS, 4); }
       } else if (ch === 'w') {
-        ctx.fillStyle = 'rgba(58,145,222,.92)';
+        ctx.fillStyle = def.snow ? 'rgba(92,150,200,.94)' : 'rgba(58,145,222,.92)';
         ctx.beginPath(); ctx.moveTo(x, y + TS);
         for (let i = 0; i <= TS; i += 4) ctx.lineTo(x + i, y + 9 + Math.sin(t * 3 + (x + i) * 0.18) * 2);
         ctx.lineTo(x + TS, y + TS); ctx.closePath(); ctx.fill();
@@ -868,6 +900,7 @@
         ctx.fillStyle = '#2f6b35'; ellipse(ctx, x + 16, y + 25, 17, 8);
         ctx.fillStyle = '#3d8543'; ellipse(ctx, x + 12, y + 23, 8, 4);
         ctx.fillStyle = '#c23b3b'; circle(ctx, x + 8, y + 26, 1.8); circle(ctx, x + 22, y + 24, 1.8);
+        if (def.snow) { ctx.fillStyle = '#f5f9fd'; ellipse(ctx, x + 12, y + 18, 7, 2.6); ellipse(ctx, x + 23, y + 19, 5, 2.2); }
       }
     }
 
@@ -917,6 +950,40 @@
       if (cp.on) { ctx.fillStyle = '#fff'; circle(ctx, cp.x + 8, cp.y - 28, 2); circle(ctx, cp.x + 5.5, cp.y - 31, 0.9); circle(ctx, cp.x + 8, cp.y - 32, 0.9); circle(ctx, cp.x + 10.5, cp.y - 31, 0.9); }
     }
 
+    function drawFire(f) {
+      const x = f.x, y = f.y;
+      const glow = ctx.createRadialGradient(x, y - 14, 4, x, y - 14, 70);
+      glow.addColorStop(0, 'rgba(255,190,110,.55)'); glow.addColorStop(1, 'rgba(255,190,110,0)');
+      ctx.fillStyle = glow; circle(ctx, x, y - 14, 70);
+      // Feuerschale auf drei Beinen
+      ctx.fillStyle = '#3c3a42';
+      ctx.fillRect(x - 10, y - 8, 2.5, 8); ctx.fillRect(x + 7.5, y - 8, 2.5, 8); ctx.fillRect(x - 1.2, y - 7, 2.4, 7);
+      ctx.beginPath(); ctx.moveTo(x - 15, y - 15); ctx.lineTo(x + 15, y - 15); ctx.quadraticCurveTo(x + 13, y - 6, x, y - 6); ctx.quadraticCurveTo(x - 13, y - 6, x - 15, y - 15); ctx.fill();
+      ctx.fillStyle = '#5a5762'; ctx.fillRect(x - 15, y - 16, 30, 2.5);
+      ctx.fillStyle = '#6b4423'; ctx.fillRect(x - 10, y - 18, 20, 3);
+      // Flammen
+      const fl = k => Math.sin(t * 13 + k) * 2 + Math.sin(t * 7.3 + k * 2) * 1.5;
+      [[13, '#e8461e', 0], [10, '#ff8a2a', 1.3], [6.5, '#ffd166', 2.6]].forEach(([w, col, k]) => {
+        const hgt = w * 2.3 + fl(k);
+        ctx.fillStyle = col;
+        ctx.beginPath(); ctx.moveTo(x - w, y - 16);
+        ctx.quadraticCurveTo(x - w * 0.9, y - 16 - hgt * 0.6, x + fl(k + 1) * 0.6, y - 16 - hgt);
+        ctx.quadraticCurveTo(x + w * 0.9, y - 16 - hgt * 0.6, x + w, y - 16);
+        ctx.fill();
+      });
+      if (Math.random() < 0.04) particles.push({ x: x + (Math.random() - 0.5) * 12, y: y - 30, vx: (Math.random() - 0.5) * 20, vy: -60, life: 0, max: 0.7, kind: 'ember', color: '#ffb347' });
+    }
+
+    const flakes = Array.from({ length: 90 }, () => ({ x: Math.random(), y: Math.random(), r: 0.8 + Math.random() * 1.8, s: 18 + Math.random() * 30, p: Math.random() * 6 }));
+    function drawSnowfall(vw, vh) {
+      ctx.fillStyle = 'rgba(255,255,255,.9)';
+      for (const f of flakes) {
+        const x = ((f.x * vw + Math.sin(t * 0.8 + f.p) * 14 - camX * 0.3 * (f.r / 2.6)) % vw + vw) % vw;
+        const y = ((f.y * vh + t * f.s - camY * 0.3 * (f.r / 2.6)) % vh + vh) % vh;
+        circle(ctx, x, y, f.r);
+      }
+    }
+
     function drawParticles() {
       for (const q of particles) {
         const a = 1 - q.life / q.max;
@@ -928,6 +995,8 @@
           tri(ctx, q.x - s * 1.1, q.y + 1, q.x + s * 1.1, q.y + 1, q.x, q.y + s * 1.4);
         } else if (q.kind === 'star') {
           ctx.fillStyle = q.color; ctx.fillRect(q.x - 1.5, q.y - 1.5, 3, 3);
+        } else if (q.kind === 'ember') {
+          ctx.fillStyle = q.color; ctx.fillRect(q.x - 1, q.y - 1, 2, 2);
         } else {
           ctx.fillStyle = q.color; circle(ctx, q.x, q.y, q.kind === 'dust' ? 2.5 * a + 1 : 2.4);
         }
@@ -948,6 +1017,7 @@
       for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) { const ch = lv.grid[r][c]; if (ch !== '.' && ch !== 'L' && ch !== 'w') drawTile(ch, c, r); }
       lv.signs.forEach(drawSign);
       lv.checkpoints.forEach(drawFlag);
+      lv.fires.forEach(drawFire);
       for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) if (lv.grid[r][c] === 'L') drawTile('L', c, r);
       drawBowl(ctx, lv.milk.x, lv.milk.y, t);
       lv.fish.forEach(f => { if (!f.got) drawFish(f); });
@@ -963,11 +1033,21 @@
         const show = p.inv <= 0 || Math.floor(p.inv * 12) % 2 === 0;
         let cx = p.x + p.w / 2, by = p.y + p.h;
         if (state === 'dead') cx += Math.sin(t * 70) * 1.5;
+        else if (def.snow && state === 'play' && warmth < 5) cx += Math.sin(t * 55) * 0.8;
         if (state === 'dead' && deathKind === 'water') by -= Math.min(deadT, 0.3) * 30;
         if (show) drawCat(ctx, cx, by, p.face, mode, p.ph, p.blinkT < 0);
       }
       for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) if (lv.grid[r][c] === 'w') drawTile('w', c, r);
       drawParticles();
+      if (def.snow) {
+        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+        drawSnowfall(vw, vh);
+        if (warmBar) {
+          warmBar.style.width = (warmth / WARM_MAX * 100).toFixed(1) + '%';
+          warmNum.textContent = Math.ceil(warmth);
+          warmEl.classList.toggle('cold', warmth < 5);
+        }
+      }
     }
 
     /* --- Schleife --- */
