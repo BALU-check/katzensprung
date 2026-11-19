@@ -5,7 +5,8 @@
   const TS = 32, G = 1900, MAXFALL = 820, RUN = 190, JUMP = 575, CLIMB = 135, HOP = 440;
   const STEP = 1 / 120, WARM_MAX = 15;
 
-  const FUR = '#f39a3d', FUR_D = '#d4712a', FUR_L = '#ffe3bf', PINK = '#ff9aa8', INK = '#2b1d14';
+  const FUR = '#26252b', FUR_D = '#141317', FUR_SHINE = '#3d3c47', WHITE = '#f7f5f0', PINK = '#ff9aa8', INK = '#2b1d14';
+  const EYE = '#c9e04b', EYE_LID = '#a9a9b6';
 
   // Himmel: oben, unten, ferne Hügel, nahe Hügel, Sonne
   const SKIES = [
@@ -255,16 +256,14 @@
       if (air) dx = i < 2 ? -3 : 3;
       ctx.fillStyle = i % 2 ? FUR : FUR_D;
       ctx.fillRect(lx + dx - 2.2, -9 + bob, 4.4, 9 - bob);
-      ctx.fillStyle = FUR_L; ctx.fillRect(lx + dx - 2.2, -2, 4.4, 2);
+      ctx.fillStyle = WHITE; ctx.fillRect(lx + dx - 2.4, -3.4, 4.8, 3.4);
     });
 
     // Körper
     ctx.fillStyle = FUR; ellipse(ctx, 0, -12 + bob, 13.5, 7.5);
-    ctx.fillStyle = FUR_L; ellipse(ctx, 1.5, -7.5 + bob, 8, 3);
-    ctx.strokeStyle = FUR_D; ctx.lineWidth = 2;
-    [-8, -3, 2].forEach(sx => {
-      ctx.beginPath(); ctx.moveTo(sx, -19 + bob); ctx.quadraticCurveTo(sx + 2.5, -16 + bob, sx + 1, -12.5 + bob); ctx.stroke();
-    });
+    ctx.fillStyle = FUR_SHINE; ellipse(ctx, -2, -16.5 + bob, 8, 1.6);
+    // weißer Latz an der Brust
+    ctx.fillStyle = WHITE; ellipse(ctx, 9.5, -10 + bob, 4.2, 5.6, -0.25);
 
     // Kopf
     const hx = drink ? 15 : 11, hy = (drink ? -9 : -18) + bob;
@@ -275,25 +274,26 @@
     tri(ctx, hx - 4.8, hy - 5, hx - 4.3, hy - 10, hx - 1.4, hy - 6.4);
     tri(ctx, hx + 2, hy - 6.4, hx + 4.4, hy - 10, hx + 5.4, hy - 4.8);
     ctx.fillStyle = FUR; circle(ctx, hx, hy, 7.6);
-    ctx.fillStyle = FUR_D; ctx.fillRect(hx - 2, hy - 7.4, 1.4, 3); ctx.fillRect(hx + 0.6, hy - 7.6, 1.4, 3.2);
-    ctx.fillStyle = FUR_L; ellipse(ctx, hx + 4.6, hy + 3, 3.9, 2.9);
+    ctx.fillStyle = FUR_SHINE; ellipse(ctx, hx - 2, hy - 4.5, 3, 1.3, -0.4);
+    ctx.fillStyle = WHITE; ellipse(ctx, hx + 4.6, hy + 3, 3.9, 2.9);
     // Augen
     if (dead) {
-      ctx.strokeStyle = INK; ctx.lineWidth = 1.2;
+      ctx.strokeStyle = EYE_LID; ctx.lineWidth = 1.2;
       [[hx + 0.5, hy - 1], [hx + 5, hy - 1.3]].forEach(([ex, ey]) => {
         ctx.beginPath(); ctx.moveTo(ex - 1.5, ey - 1.5); ctx.lineTo(ex + 1.5, ey + 1.5); ctx.moveTo(ex + 1.5, ey - 1.5); ctx.lineTo(ex - 1.5, ey + 1.5); ctx.stroke();
       });
     } else if (blink || drink) {
-      ctx.strokeStyle = INK; ctx.lineWidth = 1.2;
+      ctx.strokeStyle = EYE_LID; ctx.lineWidth = 1.2;
       ctx.beginPath(); ctx.moveTo(hx - 1.2, hy - 1); ctx.quadraticCurveTo(hx + 0.5, hy + 0.4, hx + 2.2, hy - 1); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(hx + 3.4, hy - 1.3); ctx.quadraticCurveTo(hx + 5, hy, hx + 6.6, hy - 1.3); ctx.stroke();
     } else {
-      ctx.fillStyle = INK; circle(ctx, hx + 0.5, hy - 1, 1.8); circle(ctx, hx + 5, hy - 1.3, 1.8);
-      ctx.fillStyle = '#fff'; circle(ctx, hx + 1.1, hy - 1.7, 0.65); circle(ctx, hx + 5.6, hy - 2, 0.65);
+      ctx.fillStyle = EYE; circle(ctx, hx + 0.5, hy - 1, 2.1); circle(ctx, hx + 5, hy - 1.3, 2.1);
+      ctx.fillStyle = '#000'; ellipse(ctx, hx + 0.8, hy - 1, 0.8, 1.7); ellipse(ctx, hx + 5.3, hy - 1.3, 0.8, 1.7);
+      ctx.fillStyle = '#fff'; circle(ctx, hx + 1.3, hy - 1.9, 0.6); circle(ctx, hx + 5.8, hy - 2.2, 0.6);
     }
     ctx.fillStyle = PINK; circle(ctx, hx + 7.4, hy + 1.4, 1.25);
     if (drink && Math.sin(ph * 3) > 0) { ctx.fillStyle = '#ff7b8d'; ellipse(ctx, hx + 8, hy + 5, 1.4, 1.8); }
-    ctx.strokeStyle = 'rgba(70,45,25,.55)'; ctx.lineWidth = 0.6;
+    ctx.strokeStyle = 'rgba(255,255,255,.75)'; ctx.lineWidth = 0.6;
     ctx.beginPath(); ctx.moveTo(hx + 6, hy + 3); ctx.lineTo(hx + 12.5, hy + 1.8); ctx.moveTo(hx + 6, hy + 3.6); ctx.lineTo(hx + 12.5, hy + 4.8); ctx.stroke();
     ctx.restore();
   }
