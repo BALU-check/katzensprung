@@ -366,10 +366,9 @@
       restart: '<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M4 3v5h5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
       sound: '<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
       full: '<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-      menu: '<svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
       fish: '<svg viewBox="0 0 28 16"><path d="M2 8c4-6 13-7 18 0-5 7-14 6-18 0z" fill="#5aa9e6"/><path d="M19 8l7-5v10z" fill="#5aa9e6"/><circle cx="7" cy="6.8" r="1.4" fill="#1d3557"/></svg>',
     };
-    const nextHref = levelNo < LEVELS.length ? `level${levelNo + 1}.html` : null;
+    const isLast = levelNo === LEVELS.length;
 
     document.body.insertAdjacentHTML('beforeend', `
       <canvas id="game"></canvas>
@@ -383,7 +382,6 @@
           <button class="icon-btn" id="btnRestart" aria-label="Level neu starten">${ICON.restart}</button>
           <button class="icon-btn" id="btnSound" aria-label="Ton an oder aus">${ICON.sound}</button>
           <button class="icon-btn" id="btnFull" aria-label="Vollbild">${ICON.full}</button>
-          <a class="icon-btn" href="index.html" aria-label="Zur Levelübersicht">${ICON.menu}</a>
         </div>
       </div>
       <div class="sign-banner" id="signBanner" hidden></div>
@@ -409,11 +407,10 @@
       <div class="overlay" id="winOv" hidden>
         <div class="card">
           <p class="eyebrow">Level ${levelNo} geschafft</p>
-          <h1>${nextHref ? 'Mmmh, Milch!' : 'Alle Level geschafft!'}</h1>
+          <h1>${isLast ? 'Alle Level geschafft!' : 'Mmmh, Milch!'}</h1>
           <p id="winText"></p>
           <div class="btn-row">
-            ${nextHref ? `<a class="big-btn" href="${nextHref}">Nächstes Level</a>` : `<a class="big-btn" href="index.html">Zur Übersicht</a>`}
-            <button class="ghost-btn" id="btnAgain">Nochmal spielen</button>
+            <button class="big-btn" id="btnAgain">Nochmal spielen</button>
           </div>
         </div>
       </div>
@@ -661,9 +658,10 @@
         if (winT % 0.35 < dt) particles.push({ x: lv.milk.x + 10 + Math.random() * 12, y: lv.milk.y + 6, vx: Math.random() * 6, vy: 0, life: 0, max: 1.4, kind: 'heart' });
         if (winT > 2.2 && winOv.hidden) {
           winOv.hidden = false;
-          $('winText').textContent = (levelNo === LEVELS.length
+          $('winText').textContent = (isLast
             ? 'Minka ist satt und glücklich. '
-            : 'Minka hat ihre Schale Milch gefunden. ') + `Du hast ${fishGot} von ${fishTotal} Fischen gesammelt.`;
+            : 'Minka hat ihre Schale Milch gefunden. ') + `Du hast ${fishGot} von ${fishTotal} Fischen gesammelt.`
+            + (isLast ? '' : ` Such jetzt den QR-Code für Level ${levelNo + 1}!`);
         }
         return;
       }
