@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Katzensprung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grandstander:wght@600;800&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* Layout: Kopf mit laufender Katze auf der Mauer, darunter ein Raster aus sechs QR-Karten, unten Steuerung und Adress-Einstellung */
+:root {
+  --bg: #e9f3fb;
+  --surface: #ffffff;
+  --ink: #23293d;
+  --muted: #5d6680;
+  --line: #cfdcea;
+  --accent: #e9791b;
+  --accent-ink: #ffffff;
+  --grass: #3f8f45;
+  --display: 'Grandstander', 'Trebuchet MS', system-ui, sans-serif;
+  --body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141a2a; --surface: #1e2639; --ink: #eef2fa; --muted: #a3adc4; --line: #313b55;
+    --accent: #ff9a45; --accent-ink: #1b1306; --grass: #6cc070; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141a2a; --surface: #1e2639; --ink: #eef2fa; --muted: #a3adc4; --line: #313b55;
+  --accent: #ff9a45; --accent-ink: #1b1306; --grass: #6cc070; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 32px 16px 56px; display: grid; gap: 40px; }
+
+header { display: grid; gap: 12px; }
+.eyebrow { text-transform: uppercase; letter-spacing: .14em; font-size: 12px; font-weight: 800; color: var(--muted); margin: 0; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(44px, 9vw, 84px); line-height: .95; margin: 0; color: var(--accent); text-wrap: balance; }
+.lede { max-width: 62ch; font-size: 18px; margin: 0; }
+.hero { width: 100%; height: 110px; display: block; border-bottom: 6px solid var(--grass); }
+
+h2 { font-family: var(--display); font-weight: 800; font-size: 28px; margin: 0 0 4px; text-wrap: balance; }
+.section-intro { margin: 0 0 18px; color: var(--muted); max-width: 62ch; }
+
+.levels { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 18px; }
+.level {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px;
+  display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto 1fr auto; gap: 4px 16px; min-width: 0;
+}
+.level-no { font-family: var(--display); font-weight: 800; font-size: 14px; color: var(--accent); margin: 0; display: flex; gap: 8px; align-items: center; }
+.done { font-family: var(--body); font-size: 12px; font-weight: 800; color: var(--grass); border: 1.5px solid currentColor; border-radius: 999px; padding: 0 8px; }
+.level h3 { font-family: var(--display); font-weight: 800; font-size: 22px; margin: 0; line-height: 1.15; }
+.level p.desc { margin: 4px 0 0; color: var(--muted); font-size: 15px; min-width: 0; }
+.qr { grid-column: 2; grid-row: 1 / span 3; width: 128px; height: 128px; background: #fff; border-radius: 10px; padding: 8px; align-self: start; }
+.qr canvas, .qr img { width: 112px !important; height: 112px !important; display: block; }
+.level-foot { grid-column: 1 / -1; display: flex; gap: 12px; align-items: center; justify-content: space-between; margin-top: 12px; flex-wrap: wrap; }
+.url { font-family: var(--mono); font-size: 12px; color: var(--muted); overflow-wrap: anywhere; min-width: 0; flex: 1 1 140px; user-select: all; }
+.play {
+  font-family: var(--display); font-weight: 800; font-size: 17px; background: var(--accent); color: var(--accent-ink);
+  border-radius: 999px; padding: 8px 20px; text-decoration: none; white-space: nowrap;
+}
+.play:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+.how { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 18px; margin: 0; padding: 0; list-style: none; }
+.how li { border-top: 3px solid var(--line); padding-top: 10px; }
+.how b { font-family: var(--display); font-size: 18px; display: block; }
+.how span { color: var(--muted); font-size: 15px; }
+
+.setup { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px; display: grid; gap: 10px; }
+.setup label { font-weight: 800; }
+.setup-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.setup input {
+  flex: 1 1 260px; min-width: 0; font-family: var(--mono); font-size: 14px; padding: 10px 12px; border-radius: 10px;
+  border: 1.5px solid var(--line); background: var(--bg); color: var(--ink);
+}
+.setup button {
+  font-family: var(--body); font-weight: 800; font-size: 15px; padding: 10px 16px; border-radius: 10px; cursor: pointer;
+  border: 1.5px solid var(--line); background: transparent; color: var(--ink);
+}
+.setup p { margin: 0; color: var(--muted); font-size: 14px; max-width: 70ch; }
+.warn { color: var(--accent) !important; font-weight: 800; }
+@media (max-width: 380px) { .qr { grid-column: 1 / -1; grid-row: auto; justify-self: start; margin-top: 10px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Ein Jump &amp; Run in sechs Leveln</p>
+    <h1>Katzensprung</h1>
+    <p class="lede">Die kleine Katze Minka hat Durst. Sie klettert über Gartenmauern und Bäume, weicht Pfützen, Dornen und Hunden aus und findet am Ende jedes Levels ihre Schale Milch. Scanne einen QR-Code mit dem Handy, dreh es quer und spiel los.</p>
+    <canvas id="kz-hero" class="hero" aria-label="Minka läuft über die Mauer zu ihrer Schale Milch"></canvas>
+  </header>
+
+  <section>
+    <h2>Die sechs Level</h2>
+    <p class="section-intro">Jedes Level hat eine eigene Adresse. Die Level werden der Reihe nach schwerer, du kannst aber mit jedem anfangen.</p>
+    <div class="levels" id="levels"></div>
+  </section>
+
+  <section>
+    <h2>So spielst du</h2>
+    <ul class="how">
+      <li><b>Laufen und springen</b><span>Links unten ◀ und ▶, rechts unten der Sprung-Knopf. Am Computer: Pfeiltasten und Leertaste.</span></li>
+      <li><b>Klettern</b><span>Lauf gegen eine Backsteinmauer oder einen Baumstamm und halte die Richtung gedrückt. Oben angekommen hüpft Minka drüber.</span></li>
+      <li><b>Wandsprung</b><span>Hängt Minka an der Wand, springt sie mit dem Sprung-Knopf zur anderen Seite ab.</span></li>
+      <li><b>Aufpassen</b><span>Wasser, Dornenbüsche und Hunde schicken Minka zurück zur letzten Fahne. Fische sind ein Bonus.</span></li>
+    </ul>
+  </section>
+
+  <section class="setup">
+    <label for="baseUrl">Adresse für die QR-Codes</label>
+    <div class="setup-row">
+      <input id="baseUrl" type="url" spellcheck="false" autocomplete="off" placeholder="https://example.org/katzensprung/">
+      <button id="resetBase" type="button">Automatisch erkennen</button>
+    </div>
+    <p id="baseNote">Die QR-Codes zeigen auf diese Adresse plus <code>level1.html</code> bis <code>level6.html</code>. Liegt das Spiel woanders, etwa auf GitHub Pages oder Netlify, trag hier den Ordner ein.</p>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="game.js"></script>
+<script>
+(function () {
+  const DESCS = [
+    'Erste Schritte: laufen, springen und über eine hohe Mauer klettern.',
+    'Pfützen und Bretter. Wer ins Wasser fällt, muss zurück.',
+    'Hohe Bäume. Von Krone zu Krone springen, ohne in den Teich zu fallen.',
+    'Mauern, Dornen und zwei wachsame Hunde.',
+    'Ein hoher Turm. Immer weiter nach oben klettern.',
+    'Das Finale: ganz oben im großen Baum wartet die Milch.'
+  ];
+  const levels = (window.Katzensprung && window.Katzensprung.LEVELS) || [];
+  let progress = {};
+  try { progress = JSON.parse(localStorage.getItem('katzensprung-fortschritt')) || {}; } catch (e) { progress = {}; }
+
+  const KEY = 'katzensprung-qr-adresse';
+  const detect = () => new URL('.', location.href).href;
+  let base = detect();
+  try { base = localStorage.getItem(KEY) || base; } catch (e) { /* egal */ }
+  const input = document.getElementById('baseUrl');
+  const note = document.getElementById('baseNote');
+  const list = document.getElementById('levels');
+
+  list.innerHTML = levels.map((lv, i) => {
+    const n = i + 1, fish = progress[n];
+    return `<article class="level">
+      <p class="level-no">Level ${n}${fish !== undefined ? `<span class="done">geschafft</span>` : ''}</p>
+      <h3>${lv.name}</h3>
+      <p class="desc">${DESCS[i]}</p>
+      <div class="qr" id="qr${n}" role="img" aria-label="QR-Code für Level ${n}"></div>
+      <div class="level-foot"><span class="url" id="url${n}"></span><a class="play" href="level${n}.html">Spielen</a></div>
+    </article>`;
+  }).join('');
+
+  function render() {
+    let b = base.trim();
+    if (b && !b.endsWith('/') && !/\.html?$/i.test(b)) b += '/';
+    b = b.replace(/[^/]*\.html?$/i, '');
+    const local = /^(file:|about:|blob:)/i.test(b) || /\/\/(localhost|127\.)/i.test(b);
+    note.classList.toggle('warn', local);
+    note.innerHTML = local
+      ? 'Diese Adresse ist nur auf diesem Computer erreichbar, das Handy kann sie nicht öffnen. Lade den Ordner auf einen Webserver (zum Beispiel GitHub Pages oder Netlify) und trag hier die Web-Adresse ein.'
+      : 'Die QR-Codes zeigen auf diese Adresse plus <code>level1.html</code> bis <code>level6.html</code>. Liegt das Spiel woanders, etwa auf GitHub Pages oder Netlify, trag hier den Ordner ein.';
+    levels.forEach((_, i) => {
+      const n = i + 1, url = b + `level${n}.html`;
+      document.getElementById('url' + n).textContent = url;
+      const box = document.getElementById('qr' + n);
+      box.innerHTML = '';
+      if (window.QRCode) new QRCode(box, { text: url, width: 224, height: 224, colorDark: '#23293d', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+      else box.textContent = 'QR-Code konnte nicht geladen werden.';
+    });
+  }
+  input.value = base;
+  input.addEventListener('input', () => {
+    base = input.value;
+    try { localStorage.setItem(KEY, base); } catch (e) { /* egal */ }
+    render();
+  });
+  document.getElementById('resetBase').addEventListener('click', () => {
+    base = detect(); input.value = base;
+    try { localStorage.removeItem(KEY); } catch (e) { /* egal */ }
+    render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>
